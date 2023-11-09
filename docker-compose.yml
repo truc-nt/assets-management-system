@@ -1,0 +1,43 @@
+version: "3.2"
+
+services:
+  mysql_db:
+    image: mysql
+    container_name: mysql_db
+    env_file: .env
+    environment:
+      - MYSQL_ROOT_PASSWORD=$DB_PASSWORD
+      - MYSQL_DATABASE=$DB_NAME
+    ports:
+      - 3306:3306
+    volumes:
+      - mysql_db1:/var/lib/mysql
+    healthcheck:
+          test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+          timeout: 10s
+          retries: 10
+  server:
+    depends_on:
+      mysql_db:
+        condition: service_healthy
+    build: ./server
+    container_name: server
+    env_file: .env
+    environment:
+      - CONNECTION_URL=$CONNECTION_URL
+      - PORT=$PORT
+    ports:
+      # machinePort:appPort
+      - $PORT:$PORT
+  client:
+    depends_on:
+      server:
+        condition: service_started
+    build: ./client
+    container_name: client
+    ports:
+      - 3000:3000
+
+volumes:
+  mysql_db1:
+    driver: local
