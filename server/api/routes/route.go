@@ -9,5 +9,6 @@ func LoadRoutes(r *gin.Engine) {
 	{
 		LoadAssetRoute(superGroup.Group("/assets"))
 		LoadDepartmentRoute(superGroup.Group("/departments"))
+		LoadAuthRoute(superGroup.Group("/auth"))
 	}
 }
