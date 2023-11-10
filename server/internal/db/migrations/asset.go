@@ -6,10 +6,10 @@ import (
 	"gorm.io/gorm"
 )
 
-func MigrateUpAssets(db *gorm.DB) {
-	db.AutoMigrate(&models.Assets{})
+func MigrateUpAsset(db *gorm.DB) {
+	db.AutoMigrate(&models.Asset{})
 }
 
-func MigrateDownAssets(db *gorm.DB) {
+func MigrateDownAsset(db *gorm.DB) {
 	db.Migrator().DropTable("assets")
 }

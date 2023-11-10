@@ -25,7 +25,7 @@ func ConnectDB() {
 		log.Fatal("Failed to create database")
 	}
 
-	dsn = dsn + db_name
+	dsn = dsn + db_name + "?charset=utf8mb4&parseTime=True&loc=Local"
 	DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 
 	migrations.MigrateUp(DB)

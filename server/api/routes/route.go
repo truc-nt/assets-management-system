@@ -7,6 +7,7 @@ import (
 func LoadRoutes(r *gin.Engine) {
 	superGroup := r.Group("/api")
 	{
-		LoadAssetsRoute(superGroup.Group("/assets"))
+		LoadAssetRoute(superGroup.Group("/assets"))
+		LoadDepartmentRoute(superGroup.Group("/departments"))
 	}
 }
