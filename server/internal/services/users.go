@@ -5,17 +5,27 @@ import (
 	"server/internal/models"
 )
 
-var AuthenticateUser = func(userAuthParam models.UserAuthParam) error {
-	err := models.AuthenticateUser(db.DB, userAuthParam)
+var FindUserByUsername = func(username string) error {
+	err := models.FindUserByUsername(db.DB, username)
 	return err
 }
 
-var SetLoginUser = func(username string) error {
-	err := models.SetLoginUser(db.DB, username)
+var CreateUser = func(UserRegisterParam models.UserRegisterParam) (uint32, error) {
+	id, err := models.CreateUser(db.DB, UserRegisterParam)
+	return id, err
+}
+
+var AuthenticateUser = func(userAuthParam models.UserAuthParam) (uint32, error) {
+	id, err := models.AuthenticateUser(db.DB, userAuthParam)
+	return id, err
+}
+
+var SetLoginUser = func(id uint32) error {
+	err := models.SetLoginUser(db.DB, id)
 	return err
 }
 
-var SetLogoutUser = func(username string) error {
-	err := models.SetLogoutUser(db.DB, username)
+var SetLogoutUser = func(id uint32) error {
+	err := models.SetLogoutUser(db.DB, id)
 	return err
 }

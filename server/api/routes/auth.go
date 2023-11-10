@@ -10,4 +10,5 @@ func LoadAuthRoute(route *gin.RouterGroup) {
 	authHandler := handlers.NewAuthHandler()
 	route.POST("/login", authHandler.Login)
 	route.POST("/logout", authHandler.Logout)
+	route.POST("/register", authHandler.Register)
 }
