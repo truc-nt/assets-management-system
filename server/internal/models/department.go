@@ -14,7 +14,7 @@ func GetDepartments(db *gorm.DB) ([]*Department, error) {
 	for _, department := range departments {
 		departmentInfo := Department{
 			Id:   department.ID,
-			Name: department.Username,
+			Name: department.DName,
 		}
 		departmentsInfo = append(departmentsInfo, &departmentInfo)
 	}
