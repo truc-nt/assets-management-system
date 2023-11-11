@@ -15,9 +15,9 @@ var CreateUser = func(UserRegisterParam models.UserRegisterParam) (uint32, error
 	return id, err
 }
 
-var AuthenticateUser = func(userAuthParam models.UserAuthParam) (uint32, error) {
-	id, err := models.AuthenticateUser(db.DB, userAuthParam)
-	return id, err
+var AuthenticateUser = func(userAuthParam models.UserAuthParam) (uint32, uint32, error) {
+	id, role, err := models.AuthenticateUser(db.DB, userAuthParam)
+	return id, role, err
 }
 
 var SetLoginUser = func(id uint32) error {

@@ -51,13 +51,13 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
-	id, err := services.AuthenticateUser(loginReqParam)
+	id, role, err := services.AuthenticateUser(loginReqParam)
 	if err != nil {
 		h.handleError(c, err)
 		return
 	}
 
-	h.handleSuccessLogin(c, id)
+	h.handleSuccessLogin(c, id, role)
 }
 
 func (h *AuthHandler) Logout(c *gin.Context) {
@@ -88,7 +88,7 @@ func (h *AuthHandler) handleError(c *gin.Context, err error) {
 	log.Println(err.Error())
 }
 
-func (h *AuthHandler) handleSuccessLogin(c *gin.Context, id uint32) {
+func (h *AuthHandler) handleSuccessLogin(c *gin.Context, id uint32, role uint32) {
 	err := services.SetLoginUser(id)
 	if err != nil {
 		h.handleError(c, err)
@@ -96,5 +96,11 @@ func (h *AuthHandler) handleSuccessLogin(c *gin.Context, id uint32) {
 	}
 
 	c.Header("Content-Type", "application/json")
-	c.JSON(http.StatusOK, struct{ Id uint32 }{Id: id})
+	c.JSON(http.StatusOK, struct {
+		Id   uint32
+		Role uint32
+	}{
+		Id:   id,
+		Role: role,
+	})
 }
