@@ -14,9 +14,10 @@ Instruction:
             Password: string
             Role: uint32
             Telephone: string
+            DName: string
       }
       ```
-  * POST: http://localhost:8080/api/auth/login -> nếu thành công trả về id và role
+  * POST: http://localhost:8080/api/auth/login -> nếu thành công trả về id, role và DName
     * req
       ```
       {
