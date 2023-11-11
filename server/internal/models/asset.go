@@ -11,6 +11,8 @@ type Asset struct {
 	Name         string     `gorm:"column:name" json:"name"`
 	Type         string     `gorm:"column:type" json:"type"`
 	Status       string     `gorm:"column:status" json:"status"`
+	StatusNote   string     `gorm:"column:status_note" json:"status_note"`
+	Description  string     `gorm:"column:description" json:"description"`
 	DepartmentId uint32     `gorm:"column:department_id" json:"department_id"`
 	department   Department `gorm:"foreignKey:DepartmentId;"`
 	CreatedAt    time.Time  `json:"created_at" gorm:"autoCreateTime"`
