@@ -8,5 +8,5 @@ import (
 
 func LoadDepartmentRoute(route *gin.RouterGroup) {
 	departmentHandler := handlers.NewDepartmentHandler()
-	route.POST("/", departmentHandler.CreateDepartment)
+	route.GET("/", departmentHandler.GetDepartments)
 }

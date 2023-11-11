@@ -11,6 +11,7 @@ type User struct {
 	Login     bool   `gorm:"column:login" json:"login"`
 	Role      uint32 `gorm:"column:role" json:"role"`
 	Telephone string `gorm:"column:telephone" json:"telephone"`
+	DName     string `gorm:"column:dname" json:"dname"`
 }
 
 type UserAuthParam struct {
@@ -23,6 +24,7 @@ type UserRegisterParam struct {
 	Password  string
 	Telephone string
 	Role      uint32
+	DName     string
 }
 
 func CreateUser(db *gorm.DB, userRegisterParam UserRegisterParam) (uint32, error) {
@@ -43,10 +45,10 @@ func FindUserByUsername(db *gorm.DB, username string) error {
 	return result.Error
 }
 
-func AuthenticateUser(db *gorm.DB, userAuthParam UserAuthParam) (uint32, uint32, error) {
+func AuthenticateUser(db *gorm.DB, userAuthParam UserAuthParam) (User, error) {
 	var user User
 	result := db.Model(&User{}).Where(&User{Username: userAuthParam.Username, Password: userAuthParam.Password}).First(&user)
-	return user.ID, user.Role, result.Error
+	return user, result.Error
 }
 
 func SetLoginUser(db *gorm.DB, id uint32) error {

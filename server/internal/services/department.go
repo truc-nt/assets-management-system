@@ -5,6 +5,6 @@ import (
 	"server/internal/models"
 )
 
-var CreateDepartment = func(department *models.Department) error {
-	return models.CreateDepartment(db.DB, department)
+var GetDepartments = func() ([]*models.Department, error) {
+	return models.GetDepartments(db.DB)
 }
