@@ -33,6 +33,7 @@ func CreateUser(db *gorm.DB, userRegisterParam UserRegisterParam) (uint32, error
 		Password:  userRegisterParam.Password,
 		Role:      userRegisterParam.Role,
 		Telephone: userRegisterParam.Telephone,
+		DName:     userRegisterParam.DName,
 		Login:     false,
 	}
 	result := db.Model(&User{}).Create(&user)
