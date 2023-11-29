@@ -7,6 +7,6 @@ import (
 )
 
 func LoadDepartmentRoute(route *gin.RouterGroup) {
-	departmentHandler := handlers.NewDepartmentHandler()
-	route.GET("/", departmentHandler.GetDepartments)
+	employeeHandler := handlers.NewEmployeeHandler()
+	route.GET("/", employeeHandler.GetEmployees)
 }

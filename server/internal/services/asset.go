@@ -5,8 +5,8 @@ import (
 	"server/internal/models"
 )
 
-var GetAssetsByDepartmentId = func(id uint32) ([]*models.Asset, error) {
-	return models.GetAssetsByDepartmentId(db.DB, id)
+var GetAssetsByEmployeeId = func(id uint32) ([]*models.Asset, error) {
+	return models.GetAssetsByEmployeeId(db.DB, id)
 }
 
 var GetAssetById = func(id uint32) (*models.Asset, error) {

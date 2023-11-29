@@ -8,7 +8,7 @@ import (
 
 func LoadAssetRoute(route *gin.RouterGroup) {
 	assetHandler := handlers.NewAssetHandler()
-	route.GET("/", assetHandler.GetAssetsByDepartmentId)
+	route.GET("/", assetHandler.GetAssetsByEmployeeId)
 	route.GET("/:asset_id", assetHandler.GetAssetById)
 	route.POST("/", assetHandler.CreateAsset)
 	route.PUT("/:asset_id", assetHandler.UpdateAsset)

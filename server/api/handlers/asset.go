@@ -20,13 +20,13 @@ func NewAssetHandler() *AssetHandler {
 	return &AssetHandler{}
 }
 
-func (h *AssetHandler) GetAssetsByDepartmentId(c *gin.Context) {
+func (h *AssetHandler) GetAssetsByEmployeeId(c *gin.Context) {
 	var param GetAssetsParam
 	c.ShouldBindQuery(&param)
 
 	fmt.Println(param.DepartmentId)
 
-	assets, err := services.GetAssetsByDepartmentId(param.DepartmentId)
+	assets, err := services.GetAssetsByEmployeeId(param.DepartmentId)
 	if err != nil {
 		h.handleError(c, err)
 		return
