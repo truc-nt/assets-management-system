@@ -17,7 +17,7 @@ func main() {
 	}
 	config := cors.DefaultConfig()
 	config.AllowOrigins = []string{"http://localhost:3000"}
-	r.Use(cors.New(config))
+	r.Use(cors.Default())
 
 	db.ConnectDB()
 	routes.LoadRoutes(r)
