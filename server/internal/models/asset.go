@@ -25,6 +25,12 @@ func GetAssetsByEmployeeId(db *gorm.DB, id uint32) ([]*Asset, error) {
 	return assets, err
 }
 
+func GetAssetsByDepartmentId(db *gorm.DB, id uint32) ([]*Asset, error) {
+	var assets []*Asset
+	err := db.Where("department_id = ?", id).Find(&assets).Error
+	return assets, err
+}
+
 func GetAssetById(db *gorm.DB, id uint32) (*Asset, error) {
 	var asset Asset
 	err := db.First(&asset, id).Error

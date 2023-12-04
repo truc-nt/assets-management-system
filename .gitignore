@@ -5,6 +5,8 @@
 /.pnp
 .pnp.js
 ./db.json
+/.vscode
+/server/vendor
 
 # testing
 /coverage
