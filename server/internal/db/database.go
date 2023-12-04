@@ -26,7 +26,9 @@ func ConnectDB() {
 	}
 
 	dsn = dsn + db_name + "?charset=utf8mb4&parseTime=True&loc=Local"
-	DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
+		DisableForeignKeyConstraintWhenMigrating: false,
+	})
 
 	migrations.MigrateUp(DB)
 }

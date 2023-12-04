@@ -3,11 +3,11 @@ package migrations
 import "gorm.io/gorm"
 
 func MigrateUp(DB *gorm.DB) {
+	MigrateUpUser(DB)
 	MigrateUpAsset(DB)
-	MigrateUpUsers(DB)
 }
 
 func MigrationDown(DB *gorm.DB) {
+	MigrateDownUser(DB)
 	MigrateDownAsset(DB)
-	MigrateDownUsers(DB)
 }

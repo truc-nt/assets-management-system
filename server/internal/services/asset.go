@@ -5,27 +5,45 @@ import (
 	"server/internal/models"
 )
 
-var GetAssetsByEmployeeId = func(id uint32) ([]*models.Asset, error) {
-	return models.GetAssetsByEmployeeId(db.DB, id)
+type IAssetService interface {
+	GetAssets(param *models.GetAssetsParam) ([]*models.Asset, error)
+	GetAssetById(id uint32) (*models.Asset, error)
+	CreateAsset(asset *models.Asset) error
+	UpdateAsset(id uint32, asset *models.Asset) error
+	DeleteAsset(id uint32) error
 }
 
-var GetAssetById = func(id uint32) (*models.Asset, error) {
-	return models.GetAssetById(db.DB, id)
+type AssetService struct {
+	Repository models.IAssetRepository
 }
 
-var CreateAsset = func(assets *models.Asset) error {
-	return models.CreateAsset(db.DB, assets)
+func NewAssetService() IAssetService {
+	return &AssetService{
+		Repository: models.NewAssetRepository(db.DB),
+	}
 }
 
-var UpdateAsset = func(id uint32, asset *models.Asset) error {
-	_, err := models.GetAssetById(db.DB, id)
+func (s *AssetService) GetAssets(param *models.GetAssetsParam) ([]*models.Asset, error) {
+	return s.Repository.GetAssets(param)
+}
+
+func (s *AssetService) GetAssetById(id uint32) (*models.Asset, error) {
+	return s.Repository.GetAssetById(id)
+}
+
+func (s *AssetService) CreateAsset(assets *models.Asset) error {
+	return s.Repository.CreateAsset(assets)
+}
+
+func (s *AssetService) UpdateAsset(id uint32, asset *models.Asset) error {
+	_, err := s.Repository.GetAssetById(id)
 	if err != nil {
 		return err
 	}
 	asset.Id = id
-	return models.UpdateAsset(db.DB, asset)
+	return s.Repository.UpdateAsset(asset)
 }
 
-var DeleteAsset = func(id uint32) error {
-	return models.DeleteAsset(db.DB, id)
+func (s *AssetService) DeleteAsset(id uint32) error {
+	return s.Repository.DeleteAsset(id)
 }
