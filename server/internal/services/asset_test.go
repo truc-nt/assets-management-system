@@ -28,7 +28,7 @@ var asset1 = models.Asset{
 	Status:      "working",
 	StatusNote:  "",
 	Description: "",
-	EmployeeId:  1,
+	UserId:      1,
 	CreatedAt:   time.Date(2023, time.January, 2, 15, 4, 5, 0, time.UTC),
 	UpdatedAt:   time.Date(2023, time.January, 2, 15, 4, 5, 0, time.UTC),
 }
@@ -62,7 +62,7 @@ func TestUpdateAsset(t *testing.T) {
 				Status:      asset1.Status,
 				StatusNote:  asset1.StatusNote,
 				Description: asset1.Description,
-				EmployeeId:  asset1.EmployeeId,
+				UserId:      asset1.UserId,
 				CreatedAt:   asset1.CreatedAt,
 				UpdatedAt:   asset1.UpdatedAt,
 			},
@@ -85,7 +85,7 @@ func TestUpdateAsset(t *testing.T) {
 				Status:      "not working",
 				StatusNote:  "2 days",
 				Description: "need fix",
-				EmployeeId:  asset1.EmployeeId,
+				UserId:      asset1.UserId,
 				CreatedAt:   asset1.CreatedAt,
 				UpdatedAt:   asset1.UpdatedAt,
 			},
@@ -95,7 +95,7 @@ func TestUpdateAsset(t *testing.T) {
 			args: args{
 				id: 1,
 				asset: &models.Asset{
-					EmployeeId: 2,
+					UserId: 2,
 				},
 			},
 			wantErr: nil,
@@ -106,7 +106,7 @@ func TestUpdateAsset(t *testing.T) {
 				Status:      asset1.Status,
 				StatusNote:  asset1.StatusNote,
 				Description: asset1.Description,
-				EmployeeId:  2,
+				UserId:      2,
 				CreatedAt:   asset1.CreatedAt,
 				UpdatedAt:   asset1.UpdatedAt,
 			},
@@ -137,7 +137,7 @@ func TestUpdateAsset(t *testing.T) {
 				Status:      assetAfterUpdate.Status,
 				StatusNote:  assetAfterUpdate.StatusNote,
 				Description: assetAfterUpdate.Description,
-				EmployeeId:  assetAfterUpdate.EmployeeId,
+				UserId:      assetAfterUpdate.UserId,
 				CreatedAt:   tt.want.CreatedAt,
 				UpdatedAt:   tt.want.UpdatedAt,
 			}, tt.want) {
@@ -216,7 +216,7 @@ func TestAssetService_GetAssetById(t *testing.T) {
 					Status:      got.Status,
 					StatusNote:  got.StatusNote,
 					Description: got.Description,
-					EmployeeId:  got.EmployeeId,
+					UserId:      got.UserId,
 				}, models.Asset{
 					Id:          tt.want.Id,
 					Name:        tt.want.Name,
@@ -224,7 +224,7 @@ func TestAssetService_GetAssetById(t *testing.T) {
 					Status:      tt.want.Status,
 					StatusNote:  tt.want.StatusNote,
 					Description: tt.want.Description,
-					EmployeeId:  tt.want.EmployeeId,
+					UserId:      tt.want.UserId,
 				}) {
 					t.Errorf("Got asset info: %v, wantAsset = %v", got, tt.want)
 				}
