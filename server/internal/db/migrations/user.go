@@ -6,10 +6,10 @@ import (
 	"gorm.io/gorm"
 )
 
-func MigrateUpUsers(db *gorm.DB) {
+func MigrateUpUser(db *gorm.DB) {
 	db.AutoMigrate(&models.User{})
 }
 
-func MigrateDownUsers(db *gorm.DB) {
-	db.Migrator().DropTable("users")
+func MigrateDownUser(db *gorm.DB) {
+	db.Migrator().DropTable("user")
 }
