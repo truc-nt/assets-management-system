@@ -7,6 +7,8 @@
 ./db.json
 /server/vendor
 /.vscode
+/server/.env
+.env
 
 # testing
 /coverage
