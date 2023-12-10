@@ -8,7 +8,6 @@ on:
 jobs:
   staging:
     runs-on: ubuntu-latest
-    needs: [unittest]
     steps:
       - name: Trigger deployment
         uses: johnbeynon/render-deploy-action@v1
