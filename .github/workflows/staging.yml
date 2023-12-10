@@ -1,0 +1,17 @@
+name: Deploy staging
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Trigger deployment
+        run: |
+          curl -X POST "https://api.render.com/deploy/srv-clqskc0gqk6s7390hok0?key=te31s5vVABU" \
+          -H "Content-Type: application/json" \
+          -d '{}'
