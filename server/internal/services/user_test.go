@@ -103,7 +103,7 @@ func TestUpdateUser(t *testing.T) {
 
 			err := userService.UpdateUser(tt.args.id, tt.args.user)
 			if !errors.Is(err, tt.wantErr) {
-				t.Errorf("UpdateUser() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("UpdateUser() error = %v, wantErr = %v", err, tt.wantErr)
 			}
 		})
 	}
@@ -152,7 +152,7 @@ func TestUserService_GetUsers(t *testing.T) {
 
 			got, err := userService.GetUsers(tt.args)
 			if !errors.Is(err, tt.wantErr) {
-				t.Errorf("GetUsers() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("GetUsers() error = %v, wantErr = %v", err, tt.wantErr)
 			}
 
 			if !reflect.DeepEqual(got, tt.want) {
@@ -212,11 +212,71 @@ func TestUserService_GetUserById(t *testing.T) {
 
 			got, err := userService.GetUserById(tt.args.id)
 			if !errors.Is(err, tt.wantErr) {
-				t.Errorf("GetUserById() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("GetUserById() error = %v, wantErr = %v", err, tt.wantErr)
 			}
 
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Got user info: %v, wantUser = %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestUserService_FindUserByUsername(t *testing.T) {
+	type args struct {
+		username string
+	}
+	tests := []struct {
+		name     string
+		args     args
+		mockRepo func(ctrl *gomock.Controller) models.IUserRepository
+		want     *models.User
+		wantErr  error
+	}{
+		{
+			name: "Should return error when user not exist",
+			args: args{
+				username: "khang",
+			},
+			mockRepo: func(ctrl *gomock.Controller) models.IUserRepository {
+				m := models.NewMockIUserRepository(ctrl)
+				m.EXPECT().FindUserByUsername("khang").Return(gorm.ErrRecordNotFound)
+				return m
+			},
+			wantErr: gorm.ErrRecordNotFound,
+			want:    nil,
+		},
+		{
+			name: "Should return user info when user exists",
+			args: args{
+				username: "khang",
+			},
+			mockRepo: func(ctrl *gomock.Controller) models.IUserRepository {
+				m := models.NewMockIUserRepository(ctrl)
+				m.EXPECT().FindUserByUsername("khang").Return(nil)
+				return m
+			},
+			wantErr: nil,
+			want:    &employee2,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			userService := &UserService{
+				Repository: tt.mockRepo(ctrl),
+			}
+
+			err := userService.FindUserByUsername(tt.args.username)
+			if err != tt.wantErr {
+				if errors.Is(err, gorm.ErrRecordNotFound) {
+					t.Errorf("FindUserByUsername() error = %v, wantErr = %v", err, tt.wantErr)
+				} else {
+					t.Errorf("Got user info: %v, wantUser = %v", &employee2, tt.want)
+				}
 			}
 		})
 	}
