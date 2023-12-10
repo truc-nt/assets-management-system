@@ -25,8 +25,11 @@ func ConnectDB() {
 		log.Fatal("Failed to connect to db")
 	}
 
-	dsn = fmt.Sprintf("%s/%s?charset=utf8mb4&parseTime=True&loc=Local", dsn, db_name)
+	dsn = fmt.Sprintf("%s%s?charset=utf8mb4&parseTime=True&loc=Local", dsn, db_name)
 	DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
 		DisableForeignKeyConstraintWhenMigrating: false,
 	})
+	if err != nil {
+		log.Fatal("Failed to connect to db")
+	}
 }
