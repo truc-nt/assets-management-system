@@ -11,6 +11,6 @@ jobs:
     steps:
       - name: Trigger deployment
         uses: johnbeynon/render-deploy-action@v0.0.8
-        with: 
-          service-id: ${{ secrets.RENDER_SERVICE_ID }}
+        with:
+          service-id: ${{ secrets.RENDER_SERVICE_ID }} # Can be found as part of the Deploy Hook
           api-key: ${{ secrets.RENDER_API_KEY }}
