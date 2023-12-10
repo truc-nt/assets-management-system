@@ -2,12 +2,13 @@ package services
 
 import (
 	"errors"
-	gomock "github.com/golang/mock/gomock"
-	"gorm.io/gorm"
 	"reflect"
 	"server/internal/models"
 	"testing"
 	"time"
+
+	gomock "github.com/golang/mock/gomock"
+	"gorm.io/gorm"
 )
 
 var employee1 = models.User{
@@ -30,8 +31,6 @@ var asset1 = models.Asset{
 	CreatedAt:   time.Date(2023, time.January, 2, 15, 4, 5, 0, time.UTC),
 	UpdatedAt:   time.Date(2023, time.January, 2, 15, 4, 5, 0, time.UTC),
 }
-
-var gdb *gorm.DB
 
 func TestUpdateAsset(t *testing.T) {
 	type args struct {
