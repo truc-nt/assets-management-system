@@ -35,11 +35,18 @@ func Test_GetUsers(t *testing.T) {
 				param := &models.GetUsersParam{
 					Role: 0,
 				}
-				m.EXPECT().GetUsers(param).Return([]*models.User{}, nil)
+				m.EXPECT().GetUsers(param).Return([]*models.User{{
+					ID:        1,
+					Username:  "test",
+					Password:  "test",
+					Login:     false,
+					Role:      0,
+					Telephone: "0123456789",
+				}}, nil)
 				return m
 			},
 			expectedCode: http.StatusOK,
-			expectedBody: `[]`,
+			expectedBody: `[{"id":1,"username":"test","password":"test","login":false,"role":0,"telephone":"0123456789","dname":""}]`,
 		},
 	}
 
