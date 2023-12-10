@@ -32,6 +32,10 @@ var asset2 = models.Asset{
 	UpdatedAt:   time.Date(2023, time.January, 2, 15, 4, 5, 0, time.UTC),
 }
 
+var getUsersParam = models.GetUsersParam{
+	Role: 1,
+}
+
 func TestUpdateUser(t *testing.T) {
 	type args struct {
 		id   uint32
@@ -105,6 +109,59 @@ func TestUpdateUser(t *testing.T) {
 	}
 }
 
+func TestUserService_GetUsers(t *testing.T) {
+	tests := []struct {
+		name     string
+		args     *models.GetUsersParam
+		mockRepo func(ctrl *gomock.Controller) models.IUserRepository
+		want     []*models.User
+		wantErr  error
+	}{
+		{
+			name: "Should return error when user not exist",
+			args: &getUsersParam,
+			mockRepo: func(ctrl *gomock.Controller) models.IUserRepository {
+				m := models.NewMockIUserRepository(ctrl)
+				m.EXPECT().GetUsers(&getUsersParam).Return(nil, gorm.ErrRecordNotFound)
+				return m
+			},
+			wantErr: gorm.ErrRecordNotFound,
+			want:    nil,
+		},
+		{
+			name: "Should return user info when user exists",
+			args: &getUsersParam,
+			mockRepo: func(ctrl *gomock.Controller) models.IUserRepository {
+				m := models.NewMockIUserRepository(ctrl)
+				m.EXPECT().GetUsers(&getUsersParam).Return([]*models.User{&employee2}, nil)
+				return m
+			},
+			wantErr: nil,
+			want:    []*models.User{&employee2},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			userService := &UserService{
+				Repository: tt.mockRepo(ctrl),
+			}
+
+			got, err := userService.GetUsers(tt.args)
+			if !errors.Is(err, tt.wantErr) {
+				t.Errorf("GetUsers() error = %v, wantErr %v", err, tt.wantErr)
+			}
+
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Got users info: %v, wantUser = %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestUserService_GetUserById(t *testing.T) {
 	type args struct {
 		id uint32
@@ -123,7 +180,7 @@ func TestUserService_GetUserById(t *testing.T) {
 			},
 			mockRepo: func(ctrl *gomock.Controller) models.IUserRepository {
 				m := models.NewMockIUserRepository(ctrl)
-				m.EXPECT().GetUserById(gomock.Any()).Return(nil, gorm.ErrRecordNotFound)
+				m.EXPECT().GetUserById(uint32(2)).Return(nil, gorm.ErrRecordNotFound)
 				return m
 			},
 			wantErr: gorm.ErrRecordNotFound,
@@ -132,11 +189,11 @@ func TestUserService_GetUserById(t *testing.T) {
 		{
 			name: "Should return user info when user exists",
 			args: args{
-				id: 1,
+				id: 2,
 			},
 			mockRepo: func(ctrl *gomock.Controller) models.IUserRepository {
 				m := models.NewMockIUserRepository(ctrl)
-				m.EXPECT().GetUserById(gomock.Any()).Return(&employee2, nil)
+				m.EXPECT().GetUserById(uint32(2)).Return(&employee2, nil)
 				return m
 			},
 			wantErr: nil,
