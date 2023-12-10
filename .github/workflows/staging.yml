@@ -6,12 +6,12 @@ on:
       - main
 
 jobs:
-  deploy:
+  staging:
     runs-on: ubuntu-latest
-
+    needs: [unittest]
     steps:
       - name: Trigger deployment
-        run: |
-          curl -X POST "https://api.render.com/deploy/srv-clqskc0gqk6s7390hok0?key=te31s5vVABU" \
-          -H "Content-Type: application/json" \
-          -d '{}'
+        uses: johnbeynon/render-deploy-action@v1
+        with: 
+          service-id: ${{ secrets.RENDER_SERVICE_ID }}}
+          api-key: ${{ secrets.RENDER_API_KEY }}
