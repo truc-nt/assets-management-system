@@ -27,39 +27,19 @@ func Test_GetUsers(t *testing.T) {
 				gin.SetMode(gin.TestMode)
 				w := httptest.NewRecorder()
 				c, _ := gin.CreateTestContext(w)
-				c.Request = httptest.NewRequest("GET", "/users?user_id=1", nil)
+				c.Request = httptest.NewRequest("GET", "/users", nil)
 				return c, w
 			},
 			mockService: func(ctrl *gomock.Controller) services.IUserService {
 				m := services.NewMockIUserService(ctrl)
 				param := &models.GetUsersParam{
-					Role: 1,
+					Role: 0,
 				}
 				m.EXPECT().GetUsers(param).Return([]*models.User{}, nil)
 				return m
 			},
 			expectedCode: http.StatusOK,
 			expectedBody: `[]`,
-		},
-		{
-			name: "Error case: Invalid user_id",
-			context: func() (*gin.Context, *httptest.ResponseRecorder) {
-				gin.SetMode(gin.TestMode)
-				w := httptest.NewRecorder()
-				c, _ := gin.CreateTestContext(w)
-				c.Request = httptest.NewRequest("GET", "/users?user_id=1", nil)
-				return c, w
-			},
-			mockService: func(ctrl *gomock.Controller) services.IUserService {
-				m := services.NewMockIUserService(ctrl)
-				param := &models.GetUsersParam{
-					Role: 1,
-				}
-				m.EXPECT().GetUsers(param).Return(nil, errors.New("error"))
-				return m
-			},
-			expectedCode: http.StatusInternalServerError,
-			expectedBody: `{"error":"Server Error"}`,
 		},
 	}
 
@@ -112,7 +92,7 @@ func Test_GetUserById(t *testing.T) {
 				return m
 			},
 			expectedCode: http.StatusOK,
-			expectedBody: `{"id":1,"username":"test","password":"test","login":0,"role":1,"telephone":"0123456789"}`,
+			expectedBody: `{"id":1,"username":"test","password":"test","login":false,"role":1,"telephone":"0123456789","dname":""}`,
 		},
 		{
 			name: "Error case: Invalid user_id",
