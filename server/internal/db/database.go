@@ -3,7 +3,6 @@ package db
 import (
 	"log"
 	"os"
-	"server/internal/db/migrations"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -20,15 +19,10 @@ func ConnectDB() {
 		log.Fatal("Failed to connect to db")
 	}
 
-	err = DB.Exec("CREATE DATABASE IF NOT EXISTS " + db_name).Error
-	if err != nil {
-		log.Fatal("Failed to create database")
-	}
-
 	dsn = dsn + db_name + "?charset=utf8mb4&parseTime=True&loc=Local"
 	DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
 		DisableForeignKeyConstraintWhenMigrating: false,
 	})
 
-	migrations.MigrateUp(DB)
+	//migrations.MigrateUp(DB)
 }
