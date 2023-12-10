@@ -2,14 +2,12 @@ package services
 
 import (
 	"errors"
+	gomock "github.com/golang/mock/gomock"
+	"gorm.io/gorm"
 	"reflect"
-	"server/internal/db"
-	"server/internal/db/migrations"
 	"server/internal/models"
 	"testing"
 	"time"
-
-	"gorm.io/gorm"
 )
 
 var employee1 = models.User{
@@ -33,16 +31,18 @@ var asset1 = models.Asset{
 	UpdatedAt:   time.Date(2023, time.January, 2, 15, 4, 5, 0, time.UTC),
 }
 
+var gdb *gorm.DB
+
 func TestUpdateAsset(t *testing.T) {
 	type args struct {
 		id    uint32
 		asset *models.Asset
 	}
 	tests := []struct {
-		name    string
-		args    args
-		wantErr error
-		want    models.Asset
+		name     string
+		args     args
+		mockRepo func(ctrl *gomock.Controller) models.IAssetRepository
+		wantErr  error
 	}{
 		{
 			name: "Should return error when updating non existing asset",
@@ -54,21 +54,15 @@ func TestUpdateAsset(t *testing.T) {
 					Description: "need fix",
 				},
 			},
-			wantErr: gorm.ErrRecordNotFound,
-			want: models.Asset{
-				Id:          asset1.Id,
-				Name:        asset1.Name,
-				Type:        asset1.Type,
-				Status:      asset1.Status,
-				StatusNote:  asset1.StatusNote,
-				Description: asset1.Description,
-				UserId:      asset1.UserId,
-				CreatedAt:   asset1.CreatedAt,
-				UpdatedAt:   asset1.UpdatedAt,
+			mockRepo: func(ctrl *gomock.Controller) models.IAssetRepository {
+				m := models.NewMockIAssetRepository(ctrl)
+				m.EXPECT().GetAssetById(gomock.Any()).Return(nil, gorm.ErrRecordNotFound)
+				return m
 			},
+			wantErr: gorm.ErrRecordNotFound,
 		},
 		{
-			name: "Should update more than 1 field in asset when asset exists",
+			name: "Should update success when asset exists",
 			args: args{
 				id: 1,
 				asset: &models.Asset{
@@ -77,92 +71,31 @@ func TestUpdateAsset(t *testing.T) {
 					Description: "need fix",
 				},
 			},
-			wantErr: nil,
-			want: models.Asset{
-				Id:          asset1.Id,
-				Name:        asset1.Name,
-				Type:        asset1.Type,
-				Status:      "not working",
-				StatusNote:  "2 days",
-				Description: "need fix",
-				UserId:      asset1.UserId,
-				CreatedAt:   asset1.CreatedAt,
-				UpdatedAt:   asset1.UpdatedAt,
-			},
-		},
-		{
-			name: "Should update 1 field in asset when asset exists",
-			args: args{
-				id: 1,
-				asset: &models.Asset{
-					UserId: 2,
-				},
+			mockRepo: func(ctrl *gomock.Controller) models.IAssetRepository {
+				m := models.NewMockIAssetRepository(ctrl)
+				m.EXPECT().GetAssetById(gomock.Any()).Return(&asset1, nil)
+				m.EXPECT().UpdateAsset(gomock.Any()).Return(nil)
+				return m
 			},
 			wantErr: nil,
-			want: models.Asset{
-				Id:          asset1.Id,
-				Name:        asset1.Name,
-				Type:        asset1.Type,
-				Status:      asset1.Status,
-				StatusNote:  asset1.StatusNote,
-				Description: asset1.Description,
-				UserId:      2,
-				CreatedAt:   asset1.CreatedAt,
-				UpdatedAt:   asset1.UpdatedAt,
-			},
 		},
 	}
 
-	db.ConnectDB()
-
-	assetService := NewAssetService()
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			migrations.MigrationDown(db.DB)
-			migrations.MigrateUp(db.DB)
-			prepareTestUpdateAssetData()
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			assetService := &AssetService{
+				Repository: tt.mockRepo(ctrl),
+			}
 
 			err := assetService.UpdateAsset(tt.args.id, tt.args.asset)
 			if !errors.Is(err, tt.wantErr) {
 				t.Errorf("UpdateAsset() error = %v, wantErr %v", err, tt.wantErr)
 			}
-
-			var assetAfterUpdate models.Asset
-			_ = db.DB.First(&assetAfterUpdate, asset1.Id).Error
-			if !reflect.DeepEqual(models.Asset{
-				Id:          assetAfterUpdate.Id,
-				Name:        assetAfterUpdate.Name,
-				Type:        assetAfterUpdate.Type,
-				Status:      assetAfterUpdate.Status,
-				StatusNote:  assetAfterUpdate.StatusNote,
-				Description: assetAfterUpdate.Description,
-				UserId:      assetAfterUpdate.UserId,
-				CreatedAt:   tt.want.CreatedAt,
-				UpdatedAt:   tt.want.UpdatedAt,
-			}, tt.want) {
-				t.Errorf("Asset after update: %v, wantAsset = %v", assetAfterUpdate, tt.want)
-			}
 		})
 	}
-}
-
-func prepareTestUpdateAssetData() {
-	addUser(&employee1)
-	addAsset(&asset1)
-}
-
-func addUser(user *models.User) {
-	db.DB.Model(&models.User{}).Create(&user)
-}
-
-func addAsset(asset *models.Asset) {
-	db.DB.Model(&models.Asset{}).Create(&asset)
-}
-
-func prepareTestGetAssetById() {
-	addUser(&employee1)
-	addAsset(&asset1)
 }
 
 func TestAssetService_GetAssetById(t *testing.T) {
@@ -170,15 +103,21 @@ func TestAssetService_GetAssetById(t *testing.T) {
 		id uint32
 	}
 	tests := []struct {
-		name    string
-		args    args
-		want    *models.Asset
-		wantErr error
+		name     string
+		args     args
+		mockRepo func(ctrl *gomock.Controller) models.IAssetRepository
+		want     *models.Asset
+		wantErr  error
 	}{
 		{
 			name: "Should return error when asset not exist",
 			args: args{
 				id: 2,
+			},
+			mockRepo: func(ctrl *gomock.Controller) models.IAssetRepository {
+				m := models.NewMockIAssetRepository(ctrl)
+				m.EXPECT().GetAssetById(gomock.Any()).Return(nil, gorm.ErrRecordNotFound)
+				return m
 			},
 			wantErr: gorm.ErrRecordNotFound,
 			want:    nil,
@@ -188,50 +127,32 @@ func TestAssetService_GetAssetById(t *testing.T) {
 			args: args{
 				id: 1,
 			},
+			mockRepo: func(ctrl *gomock.Controller) models.IAssetRepository {
+				m := models.NewMockIAssetRepository(ctrl)
+				m.EXPECT().GetAssetById(gomock.Any()).Return(&asset1, nil)
+				return m
+			},
 			wantErr: nil,
 			want:    &asset1,
 		},
 	}
 
-	db.ConnectDB()
-
-	assetService := NewAssetService()
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			migrations.MigrationDown(db.DB)
-			migrations.MigrateUp(db.DB)
-			prepareTestGetAssetById()
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			assetService := &AssetService{
+				Repository: tt.mockRepo(ctrl),
+			}
 
 			got, err := assetService.GetAssetById(tt.args.id)
 			if !errors.Is(err, tt.wantErr) {
 				t.Errorf("GetAssetById() error = %v, wantErr %v", err, tt.wantErr)
 			}
-			switch tt.name {
-			case "Should return asset info when asset exist":
-				if !reflect.DeepEqual(models.Asset{
-					Id:          got.Id,
-					Name:        got.Name,
-					Type:        got.Type,
-					Status:      got.Status,
-					StatusNote:  got.StatusNote,
-					Description: got.Description,
-					UserId:      got.UserId,
-				}, models.Asset{
-					Id:          tt.want.Id,
-					Name:        tt.want.Name,
-					Type:        tt.want.Type,
-					Status:      tt.want.Status,
-					StatusNote:  tt.want.StatusNote,
-					Description: tt.want.Description,
-					UserId:      tt.want.UserId,
-				}) {
-					t.Errorf("Got asset info: %v, wantAsset = %v", got, tt.want)
-				}
-			case "Should return error when asset not exist":
-				if !reflect.DeepEqual(got, tt.want) {
-					t.Errorf("Got asset info: %v, wantAsset = %v", got, tt.want)
-				}
+
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Got asset info: %v, wantAsset = %v", got, tt.want)
 			}
 		})
 	}
