@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -13,6 +14,7 @@ var DB *gorm.DB
 
 func ConnectDB() {
 	var err error
+	godotenv.Load()
 	db_user := os.Getenv("DB_USER")
 	db_password := os.Getenv("DB_PASSWORD")
 	db_host := os.Getenv("DB_HOST")
