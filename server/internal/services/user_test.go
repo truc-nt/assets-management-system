@@ -281,3 +281,123 @@ func TestUserService_FindUserByUsername(t *testing.T) {
 		})
 	}
 }
+
+func TestUserService_SetLoginUser(t *testing.T) {
+	type args struct {
+		id uint32
+	}
+	tests := []struct {
+		name     string
+		args     args
+		mockRepo func(ctrl *gomock.Controller) models.IUserRepository
+		want     *models.User
+		wantErr  error
+	}{
+		{
+			name: "Set login failed",
+			args: args{
+				id: 2,
+			},
+			mockRepo: func(ctrl *gomock.Controller) models.IUserRepository {
+				m := models.NewMockIUserRepository(ctrl)
+				m.EXPECT().SetLoginUser(uint32(2)).Return(gorm.ErrRecordNotFound)
+				return m
+			},
+			wantErr: gorm.ErrRecordNotFound,
+			want:    nil,
+		},
+		{
+			name: "Set login successfully",
+			args: args{
+				id: 2,
+			},
+			mockRepo: func(ctrl *gomock.Controller) models.IUserRepository {
+				m := models.NewMockIUserRepository(ctrl)
+				m.EXPECT().SetLoginUser(uint32(2)).Return(nil)
+				return m
+			},
+			wantErr: nil,
+			want:    &employee2,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			userService := &UserService{
+				Repository: tt.mockRepo(ctrl),
+			}
+
+			err := userService.SetLoginUser(tt.args.id)
+			if err != tt.wantErr {
+				if errors.Is(err, gorm.ErrRecordNotFound) {
+					t.Errorf("SetLoginUser() error = %v, wantErr = %v", err, tt.wantErr)
+				} else {
+					t.Errorf("Set login successfully: %v, wantUser = %v", &employee2, tt.want)
+				}
+			}
+		})
+	}
+}
+
+func TestUserService_SetLogoutUser(t *testing.T) {
+	type args struct {
+		id uint32
+	}
+	tests := []struct {
+		name     string
+		args     args
+		mockRepo func(ctrl *gomock.Controller) models.IUserRepository
+		want     *models.User
+		wantErr  error
+	}{
+		{
+			name: "Set logout failed",
+			args: args{
+				id: 2,
+			},
+			mockRepo: func(ctrl *gomock.Controller) models.IUserRepository {
+				m := models.NewMockIUserRepository(ctrl)
+				m.EXPECT().SetLogoutUser(uint32(2)).Return(gorm.ErrRecordNotFound)
+				return m
+			},
+			wantErr: gorm.ErrRecordNotFound,
+			want:    nil,
+		},
+		{
+			name: "Set logout successfully",
+			args: args{
+				id: 2,
+			},
+			mockRepo: func(ctrl *gomock.Controller) models.IUserRepository {
+				m := models.NewMockIUserRepository(ctrl)
+				m.EXPECT().SetLogoutUser(uint32(2)).Return(nil)
+				return m
+			},
+			wantErr: nil,
+			want:    &employee2,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			userService := &UserService{
+				Repository: tt.mockRepo(ctrl),
+			}
+
+			err := userService.SetLogoutUser(tt.args.id)
+			if err != tt.wantErr {
+				if errors.Is(err, gorm.ErrRecordNotFound) {
+					t.Errorf("SetLogoutUser() error = %v, wantErr = %v", err, tt.wantErr)
+				} else {
+					t.Errorf("Set logout successfully: %v, wantUser = %v", &employee2, tt.want)
+				}
+			}
+		})
+	}
+}
